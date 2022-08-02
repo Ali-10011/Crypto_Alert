@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'dart:async';
+import 'package:cryptoalert/models/TopCrypto.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -11,48 +12,38 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  late List<dynamic> jsonResponse;
-  var length = 0;
-  int i = 0;
-  Timer? timer;
-  void cryptorequest() async {
-    Map<String, String> queryParams = {
-      'vs_currency': 'usd',
-      'order': 'market_cap_desc',
-      'per_page': '10',
-      'page': '1',
-      'spartline': 'false'
-    };
-    var url =
-        Uri.https('api.coingecko.com', '/api/v3/coins/markets', queryParams);
-    var response = await http.get(
-      url,
-    );
-    if (response.statusCode == 200) {
-      jsonResponse = convert.jsonDecode(response.body) as List<dynamic>;
-      setState(() {
-        length = jsonResponse.length;
-        i++;
-      });
-      // print(jsonResponse);
-      convert.jsonEncode(jsonResponse);
-      // as Map<String, String>;
-
-      /*jsonResponse.forEach((element) {
-                        convert.jsonEncode(element);
-
-                        print(element['id']);
-                      });*/
-    } else {
-      print('Request failed with status: ${response.statusCode}.');
-    }
+extension StringExtension on String {
+  String capitalize() {
+    return "${this[0].toUpperCase()}${this.substring(1).toLowerCase()}";
   }
+}
 
+@override
+void ValSymbol(double market_cap, String Sym) {
+  if (market_cap >= 1000000000) {
+    market_cap = market_cap / 1000000000;
+    Sym = 'Bn';
+  } else if (market_cap < 1000000000 && market_cap > 100000000) {
+    market_cap = market_cap / 100000000;
+    Sym = 'Bn';
+  } else if (market_cap > 1000000 && market_cap < 100000000) {
+    market_cap = market_cap / 1000000;
+    Sym = 'M';
+  }
+}
+
+class _HomePageState extends State<HomePage> {
+  var length = 0;
+  Timer? timer;
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(Duration(seconds: 3), (Timer t) => cryptorequest());
+    timer = Timer.periodic(const Duration(seconds: 2), (Timer t) {
+      cryptorequest();
+      setState(() {
+        length = TopData.length;
+      });
+    });
   }
 
   @override
@@ -60,41 +51,61 @@ class _HomePageState extends State<HomePage> {
     timer?.cancel();
     super.dispose();
   }
-/* String k_m_b_generator(num) {
-      if (num > 999 && num < 99999) {
-        return "${(num / 1000).toStringAsFixed(1)} K";
-      } else if (num > 99999 && num < 999999) {
-        return "${(num / 1000).toStringAsFixed(0)} K";
-      } else if (num > 999999 && num < 999999999) {
-        return "${(num / 1000000).toStringAsFixed(1)} M";
-      } else if (num > 999999999) {
-        return "${(num / 1000000000).toStringAsFixed(1)} Bn";
-      } else {
-        return num.toString();
-      }
-    }*/
 
   @override
   Widget build(BuildContext context) {
+    //List<Color> AllColors = [Colors.redAccent, Colors.greenAccent, Colors.grey];
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text(
-            'Home',
-            style: TextStyle(color: Colors.black),
-          ),
-          backgroundColor: Colors.amber,
-        ),
+        //backgroundColor: Colors.black,
         body: CustomScrollView(
           slivers: [
-            SliverToBoxAdapter(
-              child: SizedBox(
+            SliverAppBar(
+              backgroundColor: Colors.white,
+              pinned: true,
+              snap: true,
+              floating: true,
+              expandedHeight: 120,
+              centerTitle: true,
+              collapsedHeight:
+                  110, //when user scrolls, how much the appbar should collpase
+              flexibleSpace: SizedBox(
                 height: 200,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: length,
                   itemBuilder: (context, index) {
+                    Color CardColor = Colors.grey;
+                    IconData CardIcon = Icons.arrow_drop_down_rounded;
+                    String Sym = ' ';
+
+                    double market_cap = double.parse(TopData[index].Market_Cap);
+                    if (market_cap >= 1000000000) {
+                      market_cap = market_cap / 1000000000;
+
+                      Sym = 'Bn';
+                    } else if (market_cap < 1000000000 &&
+                        market_cap > 100000000) {
+                      market_cap = market_cap / 100000000;
+
+                      Sym = 'Bn';
+                    } else if (market_cap > 1000000 && market_cap < 100000000) {
+                      market_cap = market_cap / 1000000;
+
+                      Sym = 'M';
+                    }
+
+                    if (double.parse(TopData[index].Cap_Daily_Change) < 0) {
+                      CardColor = Colors.redAccent;
+                      CardIcon = Icons.arrow_drop_down_rounded;
+                    } else if (double.parse(TopData[index].Cap_Daily_Change) >
+                        0) {
+                      CardColor = Colors.greenAccent;
+                      CardIcon = Icons.arrow_drop_up_rounded;
+                    } else {
+                      CardColor = Colors.grey;
+                      CardIcon = Icons.arrow_drop_up_rounded;
+                    }
                     return Container(
                       height: 200,
                       width: 200,
@@ -104,16 +115,37 @@ class _HomePageState extends State<HomePage> {
                           onTap: () {},
                           child: Card(
                               child: ListTile(
-                                  title: Text(
-                                      '${jsonResponse[index]['id']}  ${jsonResponse[index]['symbol']} '),
+                                  title: Row(children: [
+                                    CircleAvatar(
+                                      backgroundColor: Colors.white,
+                                      radius: 8,
+                                      backgroundImage:
+                                          NetworkImage(TopData[index].Icon_Url),
+                                    ),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text(
+                                        '${TopData[index].Symbol.toUpperCase()}  '),
+                                    const SizedBox(
+                                      width: 5,
+                                    ),
+                                    Icon(
+                                      CardIcon,
+                                      color: CardColor,
+                                    ),
+                                  ]),
                                   subtitle: Text(
-                                      '${jsonResponse[index]['market_cap']}')))),
+                                    '\$${market_cap.toStringAsFixed(2)} ${Sym}  ${double.parse(TopData[index].Cap_Daily_Change).toStringAsFixed(3)}%',
+                                    style: TextStyle(
+                                        color: CardColor,
+                                        fontWeight: FontWeight.w600),
+                                  )))),
                     );
                   },
                 ),
               ),
             ),
-            //Container(height: 100),
             SliverToBoxAdapter(
                 child: SizedBox(
               height: MediaQuery.of(context).size.height,
@@ -121,24 +153,78 @@ class _HomePageState extends State<HomePage> {
                   scrollDirection: Axis.vertical,
                   itemCount: length,
                   itemBuilder: (context, index) {
-                    double current_price = double.parse(jsonResponse[index]
-                            ['current_price']
-                        .toStringAsFixed(8));
-                    return Container(
-                      child: InkWell(
-                        onTap: () {},
-                        child: Card(
-                          elevation: 3.0,
-                          margin: const EdgeInsets.all(12.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(40.0),
-                          ),
-                          child: ListTile(
-                              title: Text(
-                                  '${jsonResponse[index]['id']}  ${jsonResponse[index]['symbol']}'),
-                              subtitle: Text(
-                                  ' ${current_price}    ${jsonResponse[index]['price_change_percentage_24h']}%    ${jsonResponse[index]['market_cap']}')),
+                    print(TopData[index].current_price);
+                    Color CardColor = Colors.grey;
+                    IconData CardIcon = Icons.arrow_drop_down_rounded;
+                    if (double.parse(TopData[index].Daily_Change) < 0) {
+                      CardColor = Colors.redAccent;
+                      CardIcon = Icons.arrow_drop_down_rounded;
+                    } else if (double.parse(TopData[index].Daily_Change) > 0) {
+                      CardColor = Colors.greenAccent;
+                      CardIcon = Icons.arrow_drop_up_rounded;
+                    } else {
+                      CardColor = Colors.grey;
+                      CardIcon = Icons.arrow_drop_up_rounded;
+                    }
+
+                    String Sym = ' ';
+
+                    double market_cap = double.parse(TopData[index].Market_Cap);
+                    if (market_cap >= 1000000000) {
+                      market_cap = market_cap / 1000000000;
+
+                      Sym = 'Bn';
+                    } else if (market_cap < 1000000000 &&
+                        market_cap > 100000000) {
+                      market_cap = market_cap / 100000000;
+
+                      Sym = 'Bn';
+                    } else if (market_cap > 1000000 && market_cap < 100000000) {
+                      market_cap = market_cap / 1000000;
+
+                      Sym = 'M';
+                    }
+                    //CardColor = Colors.greenAccent;
+                    return InkWell(
+                      onTap: () {},
+                      child: Card(
+                        elevation: 3.0,
+                        margin: const EdgeInsets.all(12.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.0),
                         ),
+                        child: ListTile(
+                            title: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  radius: 8,
+                                  backgroundImage:
+                                      NetworkImage(TopData[index].Icon_Url),
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Text('${TopData[index].ID.capitalize()}'),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                    '${TopData[index].Symbol.toString().toUpperCase()}')
+                              ],
+                            ),
+                            subtitle: Row(
+                              children: [
+                                Icon(CardIcon, color: CardColor),
+                                Text(
+                                  '\$${TopData[index].current_price}    ${double.parse(TopData[index].Daily_Change).toStringAsFixed(3)}%   \$${market_cap.toStringAsFixed(3)} ${Sym}',
+                                  style: TextStyle(
+                                      color: CardColor,
+                                      fontWeight: FontWeight.w600),
+                                ),
+                              ],
+                            )),
                       ),
                     );
                   }),
@@ -149,50 +235,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
-
-
-
-/*Column(
-          children: <Widget>[
-            Expanded(
-              
-              child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: 20,
-                  itemBuilder: (context, index) {
-                    double current_price = double.parse(jsonResponse[index]
-                            ['current_price']
-                        .toStringAsFixed(8));
-                    return Container(
-                      margin: EdgeInsets.all(10),
-                      child: Text(
-                          /*${double.parse(jsonResponse[index]['high_24h']).round()}*/
-                          'Hi           '),
-                    );
-                  }),
-            ),
-            Expanded(
-              child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  itemCount: length,
-                  itemBuilder: (context, index) {
-                    double current_price = double.parse(jsonResponse[index]
-                            ['current_price']
-                        .toStringAsFixed(8));
-                    return Card(
-                      elevation: 3.0,
-                      margin: const EdgeInsets.all(12.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(40.0),
-                      ),
-                      child: ListTile(
-                          title: Text(
-                              '${jsonResponse[index]['id']}  ${jsonResponse[index]['symbol']}'),
-                          subtitle: Text(
-                              ' ${current_price}    ${jsonResponse[index]['price_change_percentage_24h']}%    ${jsonResponse[index]['market_cap']}')),
-                    );
-                  }),
-            ),
-          ],
-        ), */

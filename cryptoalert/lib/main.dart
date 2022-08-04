@@ -19,9 +19,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => LoadingState(),
         '/home': (context) => HomePage(),
       },
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

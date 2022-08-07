@@ -179,112 +179,111 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               SliverToBoxAdapter(
-                  child: SizedBox(
-                height: MediaQuery.of(context).size.height,
-                child: ListView.builder(
-                    scrollDirection: Axis.vertical,
-                    itemCount: length,
-                    itemBuilder: (context, index) {
-                      bool isPressed = false;
-                      //print(IsHover);
-                      // print(TopData[index].current_price);
-                      Color CardColor = Colors.grey;
-                      IconData CardIcon = Icons.arrow_drop_down_rounded;
-                      if (double.parse(TopData[index].Daily_Change) < 0) {
-                        CardColor = Colors.redAccent;
-                        CardIcon = Icons.arrow_drop_down_rounded;
-                      } else if (double.parse(TopData[index].Daily_Change) >
-                          0) {
-                        CardColor = Colors.greenAccent;
-                        CardIcon = Icons.arrow_drop_up_rounded;
-                      } else {
-                        CardColor = Colors.grey;
-                        CardIcon = Icons.arrow_drop_up_rounded;
-                      }
+                  child: ListView.builder(
+                      physics: const ClampingScrollPhysics(), //prevents last element from being out of bounds
+                      shrinkWrap: true,
+                      scrollDirection: Axis.vertical,
+                      itemCount: length,
+                      itemBuilder: (context, index) {
+                        bool isPressed = false;
+                        //print(IsHover);
+                        // print(TopData[index].current_price);
+                        Color CardColor = Colors.grey;
+                        IconData CardIcon = Icons.arrow_drop_down_rounded;
+                        if (double.parse(TopData[index].Daily_Change) < 0) {
+                          CardColor = Colors.redAccent;
+                          CardIcon = Icons.arrow_drop_down_rounded;
+                        } else if (double.parse(TopData[index].Daily_Change) >
+                            0) {
+                          CardColor = Colors.greenAccent;
+                          CardIcon = Icons.arrow_drop_up_rounded;
+                        } else {
+                          CardColor = Colors.grey;
+                          CardIcon = Icons.arrow_drop_up_rounded;
+                        }
 
-                      String Sym = ' ';
+                        String Sym = ' ';
 
-                      double market_cap =
-                          double.parse(TopData[index].Market_Cap);
-                      if (market_cap >= 1000000000) {
-                        market_cap = market_cap / 1000000000;
+                        double market_cap =
+                            double.parse(TopData[index].Market_Cap);
+                        if (market_cap >= 1000000000) {
+                          market_cap = market_cap / 1000000000;
 
-                        Sym = 'Bn';
-                      } else if (market_cap < 1000000000 &&
-                          market_cap > 100000000) {
-                        market_cap = market_cap / 100000000;
+                          Sym = 'Bn';
+                        } else if (market_cap < 1000000000 &&
+                            market_cap > 100000000) {
+                          market_cap = market_cap / 100000000;
 
-                        Sym = 'Bn';
-                      } else if (market_cap > 1000000 &&
-                          market_cap < 100000000) {
-                        market_cap = market_cap / 1000000;
+                          Sym = 'Bn';
+                        } else if (market_cap > 1000000 &&
+                            market_cap < 100000000) {
+                          market_cap = market_cap / 1000000;
 
-                        Sym = 'M';
-                      }
-                      //CardColor = Colors.greenAccent;
-                      return GestureDetector(
-                        onTapDown: (_) {
-                          print('Hi');
-                          setState(() {
-                            isPressed = true;
-                          });
-                        },
-                        onTapUp: (_) {
-                          setState(() {
-                            isPressed = false;
-                          });
-                        },
-                        child: Container(
-                          margin: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomCenter,
-                                colors: [Colors.white60, Colors.white10]),
-                            color:
-                                Colors.white.withOpacity(isPressed ? 0.5 : 0.3),
-                            borderRadius: BorderRadius.circular(25),
-                            border:
-                                Border.all(width: 0.5, color: Colors.white30),
+                          Sym = 'M';
+                        }
+                        //CardColor = Colors.greenAccent;
+                        return GestureDetector(
+                          onTapDown: (_) {
+                            print('Hi');
+                            setState(() {
+                              isPressed = true;
+                            });
+                          },
+                          onTapUp: (_) {
+                            setState(() {
+                              isPressed = false;
+                            });
+                          },
+                          child: Container(
+                            margin: EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomCenter,
+                                  colors: [Colors.white60, Colors.white10]),
+                              color: Colors.white
+                                  .withOpacity(isPressed ? 0.5 : 0.3),
+                              borderRadius: BorderRadius.circular(25),
+                              border:
+                                  Border.all(width: 0.5, color: Colors.white30),
+                            ),
+                            child: ListTile(
+                                title: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundColor: Colors.transparent,
+                                      radius: 8,
+                                      backgroundImage:
+                                          NetworkImage(TopData[index].Icon_Url),
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text('${TopData[index].ID.capitalize()}',
+                                        style: TextStyle(color: Colors.white)),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                        '${TopData[index].Symbol.toString().toUpperCase()}',
+                                        style: TextStyle(color: Colors.white))
+                                  ],
+                                ),
+                                subtitle: Row(
+                                  children: [
+                                    Icon(CardIcon, color: CardColor),
+                                    Text(
+                                      '\$${TopData[index].current_price}    ${double.parse(TopData[index].Daily_Change).toStringAsFixed(3)}%   \$${market_cap.toStringAsFixed(3)} ${Sym}',
+                                      style: TextStyle(
+                                          color: CardColor,
+                                          fontWeight: FontWeight.w600),
+                                    ),
+                                  ],
+                                )),
                           ),
-                          child: ListTile(
-                              title: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  CircleAvatar(
-                                    backgroundColor: Colors.transparent,
-                                    radius: 8,
-                                    backgroundImage:
-                                        NetworkImage(TopData[index].Icon_Url),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text('${TopData[index].ID.capitalize()}',
-                                      style: TextStyle(color: Colors.white)),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Text(
-                                      '${TopData[index].Symbol.toString().toUpperCase()}',
-                                      style: TextStyle(color: Colors.white))
-                                ],
-                              ),
-                              subtitle: Row(
-                                children: [
-                                  Icon(CardIcon, color: CardColor),
-                                  Text(
-                                    '\$${TopData[index].current_price}    ${double.parse(TopData[index].Daily_Change).toStringAsFixed(3)}%   \$${market_cap.toStringAsFixed(3)} ${Sym}',
-                                    style: TextStyle(
-                                        color: CardColor,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                ],
-                              )),
-                        ),
-                      );
-                    }),
-              ))
+                        );
+                      }))
             ],
           ),
         ),

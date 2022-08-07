@@ -1,4 +1,5 @@
 import 'package:cryptoalert/homepage.dart';
+import 'package:cryptoalert/screens/details.dart';
 import 'package:cryptoalert/screens/loader.dart';
 import 'package:flutter/material.dart';
 
@@ -14,10 +15,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'cryptoalert',
-      initialRoute: '/',
+      initialRoute: '/details',
       routes: {
-        '/': (context) => LoadingState(),
-        '/home': (context) => HomePage(),
+        // '/': (context) => LoadingState(),
+        //'/home': (context) => HomePage(),
+        '/details': (context) => const CurrencyDetails(),
+        //'/details': (context) => const LineChartSample2(),
       },
       debugShowCheckedModeBanner: false,
     );

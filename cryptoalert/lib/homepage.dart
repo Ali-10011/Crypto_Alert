@@ -1,3 +1,4 @@
+import 'package:cryptoalert/screens/details.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:cryptoalert/models/TopCrypto.dart';
@@ -35,7 +36,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    timer = Timer.periodic(const Duration(seconds: 2), (Timer t) {
+    timer = Timer.periodic(const Duration(seconds: 3), (Timer t) {
       cryptorequest();
       setState(() {
         length = TopData.length;
@@ -223,11 +224,14 @@ class _HomePageState extends State<HomePage> {
                         }
                         //CardColor = Colors.greenAccent;
                         return GestureDetector(
+                          
                           onTapDown: (_) {
-                            print('Hi');
-                            setState(() {
-                              isPressed = true;
-                            });
+                             Navigator.of(context, rootNavigator: true)
+                            .push(MaterialPageRoute(
+                                builder: (context) => const CurrencyDetails(),
+                                settings: RouteSettings(arguments: {
+                                  'currency_ID': TopData[index].ID,
+                                })));
                           },
                           onTapUp: (_) {
                             setState(() {

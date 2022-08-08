@@ -15,10 +15,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'cryptoalert',
-      initialRoute: '/details',
+      initialRoute: '/',
       routes: {
-        // '/': (context) => LoadingState(),
-        //'/home': (context) => HomePage(),
+        '/': (context) => LoadingState(),
+        '/home': (context) => HomePage(),
         '/details': (context) => const CurrencyDetails(),
         //'/details': (context) => const LineChartSample2(),
       },

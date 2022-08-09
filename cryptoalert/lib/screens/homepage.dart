@@ -231,6 +231,7 @@ class _HomePageState extends State<HomePage> {
                                 builder: (context) => const CurrencyDetails(),
                                 settings: RouteSettings(arguments: {
                                   'currency_ID': TopData[index].ID,
+                                  'currency_Symbol' : TopData[index].Symbol.toUpperCase(),
                                 })));
                           },
                           onTapUp: (_) {

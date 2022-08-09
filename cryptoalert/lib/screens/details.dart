@@ -6,6 +6,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'dart:async';
 import 'package:cryptoalert/models/ChartData.dart';
+import 'package:cryptoalert/models/NewsData.dart';
+import 'package:url_launcher/link.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:intl/intl.dart';
 
 class CurrencyDetails extends StatefulWidget {
   const CurrencyDetails({Key? key})
@@ -21,12 +25,15 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
   double maxPrice = 0;
   double medianPrice = 0;
   late double interval = 1;
+  Future<void>? _launched;
 
   void initState() {
     super.initState();
+    //WidgetsBinding.instance?.addPostFrameCallback((_) => build(context));
     Future.delayed(Duration.zero, () async {
       //This function helps completing the initstate first, which causes error sometimes
       await _cryptochartDatarequest();
+      await _cryptonewsrequest();
       setState(() {
         //just to make the graph load
       });
@@ -94,14 +101,65 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
         } else {
           interval = 0.001;
         }
-        print(TempPrice.first);
-        print(TempPrice[MidIndex]);
-        print(TempPrice.last);
-        print(minPrice);
-        print(maxPrice);
+        //print(TempPrice.first);
+        //print(TempPrice[MidIndex]);
+        //print(TempPrice.last);
+        //print(minPrice);
+        //print(maxPrice);
       }
     } catch (e) {
+      //print('Hello');
       print(e);
+    }
+  }
+
+  Future<void> _cryptonewsrequest() async {
+    Map<dynamic, dynamic> jsonResponse;
+    Map<dynamic, dynamic> route_Data =
+        ModalRoute.of(context)!.settings.arguments as Map;
+    NewsInstance = [];
+    var response;
+    try {
+      Map<String, String> queryParams = {
+        'auth_token': 'fd91509e6f28fe89169dd415ade5bedd90239c0c',
+        'currencies': route_Data['currency_Symbol'],
+        'filter': 'hot, rising',
+        'kind': 'media'
+      };
+
+      var url = Uri.https('cryptopanic.com', '/api/v1/posts/', queryParams);
+      response = await http.get(
+        url,
+      );
+      jsonResponse = convert.jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        //print(jsonResponse['results'][0]);
+        for (int i = 0; i < jsonResponse['results'].length; i++) {
+          var dateTimeString = jsonResponse['results'][i]['published_at'];
+          final dateTime = DateTime.parse(dateTimeString);
+          final time = DateFormat('h:mma');
+          final date = DateFormat("MMMM dd, yyyy");
+          final dateString = date.format(dateTime);
+          final clockString = time.format(dateTime);
+          NewsInstance.add(NewsCard(
+              title: jsonResponse['results'][i]['title'].toString(),
+              url: jsonResponse['results'][i]['url'].toString(),
+              source: jsonResponse['results'][i]['source']['title'],
+              publish_time: '${clockString}  ${dateString}'));
+        }
+      }
+    } catch (e) {
+      //print('Hi');
+      print(e);
+    }
+  }
+
+  Future<void> _launchInBrowser(Uri url) async {
+    if (!await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
+    )) {
+      throw 'Could not launch $url';
     }
   }
 
@@ -117,7 +175,7 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
       fontSize: 15,
     );
     late String text;
-    print(value);
+    //print(value);
     if (maxPrice >= 10000) {
       if (value.toInt() == minPrice.toInt()) {
         text = (minPrice / 1000).toStringAsFixed(1).toString() + 'K';
@@ -129,21 +187,21 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
         return Container();
       }
     } else if (maxPrice >= 1000) {
-      if (value.toInt() == minPrice.toInt()) {
+      if (value == minPrice) {
         text = (minPrice / 1000).toStringAsFixed(2).toString() + 'K';
         //minPrice = -1;
-        print('Min');
-        print(value);
+        // print('Min');
+        // print(value);
       } else if (value.toInt() == medianPrice.toInt()) {
         text = (medianPrice / 1000).toStringAsFixed(2).toString() + 'K';
 
-        print('Median');
-        print(value);
-      } else if (value.toInt() == maxPrice.toInt()) {
+        //print('Median');
+        //print(value);
+      } else if (value == maxPrice) {
         text = (maxPrice / 1000).toStringAsFixed(2).toString() + 'K';
         //maxPrice = -1;
-        print('Max');
-        print(value);
+        // print('Max');
+        //print(value);
       } else {
         return Container();
       }
@@ -186,7 +244,7 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          elevation: 0,
+          //elevation: 0,
           flexibleSpace: const Image(
             image: AssetImage('assets/gradient.jpg'),
             fit: BoxFit.cover,
@@ -213,6 +271,15 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
                 collapsedHeight: MediaQuery.of(context).size.height / 2,
                 flexibleSpace: Container(
                   decoration: const BoxDecoration(
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.transparent,
+                        blurRadius: 2.0,
+                        spreadRadius: 0.0,
+                        offset:
+                            Offset(2.0, 2.0), // shadow direction: bottom right
+                      )
+                    ],
                     borderRadius: BorderRadius.all(
                       Radius.circular(0),
                     ),
@@ -221,7 +288,10 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
                   child: Padding(
                     padding: const EdgeInsets.only(
                         right: 18.0, left: 12.0, top: 24, bottom: 12),
-                    child: LineChart(LineChartData(
+                    child: LineChart(
+                      
+                      LineChartData(
+                      
                       minY: minPrice.toDouble(),
                       maxY: maxPrice.toDouble(),
                       lineTouchData: LineTouchData(enabled: true),
@@ -291,18 +361,37 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
                           const ClampingScrollPhysics(), //prevents last element from being out of bounds
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
-                      itemCount: 10,
+                      itemCount: NewsInstance.length,
                       itemBuilder: (context, index) {
-                        return const Card(
-                          color: Colors.transparent,
+                        return Card(
+                          color: Colors.transparent.withOpacity(0.2),
                           child: ListTile(
                               title: Text(
-                                'Breaking News',
+                                '${NewsInstance[index].title}',
                                 style: TextStyle(color: Colors.white),
                               ),
-                              subtitle: Text(
-                                  'Bitcoin Enthusiast Micheal Saylor quits his position as CEO',
-                                  style: TextStyle(color: Colors.white))),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      setState(() {
+                                        _launched = _launchInBrowser(
+                                            Uri.parse(NewsInstance[index].url));
+                                      });
+                                    },
+                                    child: Text('${NewsInstance[index].url}',
+                                        style: TextStyle(
+                                            color: Colors.lightBlueAccent)),
+                                  ),
+                                  Text(
+                                    NewsInstance[index].source +
+                                        ' | ' +
+                                        NewsInstance[index].publish_time,
+                                    style: TextStyle(color: Colors.grey),
+                                  )
+                                ],
+                              )),
                         );
                       }))
             ],

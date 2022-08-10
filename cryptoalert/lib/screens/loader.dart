@@ -13,7 +13,7 @@ class _LoadingStateState extends State<LoadingState> {
 
   void WaitForData() async {
     await cryptorequest();
-    Navigator.pushReplacementNamed(context, '/home');
+    Navigator.pushReplacementNamed(context, '/initial');
   }
 @override
   void initState() {

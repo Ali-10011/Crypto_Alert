@@ -1,3 +1,4 @@
+import 'package:cryptoalert/screens/CryptoConversion.dart';
 import 'package:cryptoalert/screens/details.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -181,7 +182,8 @@ class _HomePageState extends State<HomePage> {
               ),
               SliverToBoxAdapter(
                   child: ListView.builder(
-                      physics: const ClampingScrollPhysics(), //prevents last element from being out of bounds
+                      physics:
+                          const ClampingScrollPhysics(), //prevents last element from being out of bounds
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
                       itemCount: length,
@@ -224,15 +226,16 @@ class _HomePageState extends State<HomePage> {
                         }
                         //CardColor = Colors.greenAccent;
                         return GestureDetector(
-                          
                           onTapDown: (_) {
-                             Navigator.of(context, rootNavigator: true)
-                            .push(MaterialPageRoute(
-                                builder: (context) => const CurrencyDetails(),
-                                settings: RouteSettings(arguments: {
-                                  'currency_ID': TopData[index].ID,
-                                  'currency_Symbol' : TopData[index].Symbol.toUpperCase(),
-                                })));
+                            Navigator.of(context, rootNavigator: true).push(
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CurrencyDetails(),
+                                    settings: RouteSettings(arguments: {
+                                      'currency_ID': TopData[index].ID,
+                                      'currency_Symbol':
+                                          TopData[index].Symbol.toUpperCase(),
+                                    })));
                           },
                           onTapUp: (_) {
                             setState(() {

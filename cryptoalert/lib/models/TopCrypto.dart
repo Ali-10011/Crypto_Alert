@@ -1,6 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 
 class CryptoData {
   late String ID;
@@ -28,7 +29,7 @@ Future<void> cryptorequest() async {
     Map<String, String> queryParams = {
       'vs_currency': 'usd',
       'order': 'market_cap_desc',
-      'per_page': '10',
+      'per_page': '20',
       'page': '1',
       'spartline': 'false'
     };
@@ -42,7 +43,8 @@ Future<void> cryptorequest() async {
       //print(jsonResponse[0]);
       TopData = [];
       convert.jsonEncode(jsonResponse);
-      for (int i = 0; i < 10; i++) {
+      print(jsonResponse.length);
+      for (int i = 0; i < jsonResponse.length; i++) {
         TopData.add(CryptoData(
             ID: jsonResponse[i]['id'].toString(),
             Symbol: jsonResponse[i]['symbol'].toString(),

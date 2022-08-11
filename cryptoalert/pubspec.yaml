@@ -39,6 +39,7 @@ dependencies:
   fl_chart: ^0.55.1
   url_launcher: ^6.1.5
   intl: ^0.17.0
+  chart_sparkline: ^1.0.11
 
 dev_dependencies:
   flutter_test:

@@ -10,6 +10,7 @@ import 'package:cryptoalert/models/NewsData.dart';
 import 'package:url_launcher/link.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
+import 'package:chart_sparkline/chart_sparkline.dart';
 
 class CurrencyDetails extends StatefulWidget {
   const CurrencyDetails({Key? key})
@@ -21,6 +22,7 @@ class CurrencyDetails extends StatefulWidget {
 
 class _CurrencyDetailsState extends State<CurrencyDetails> {
   List<FlSpot> priceData = [];
+  String ChartTitle = '-';
   double minPrice = 0;
   double maxPrice = 0;
   double medianPrice = 0;
@@ -46,6 +48,11 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
     Map<dynamic, dynamic> route_Data =
         ModalRoute.of(context)!.settings.arguments as Map;
     String coin_ID = route_Data['currency_ID'];
+    setState(() {
+      ChartTitle =
+          '${route_Data['currency_Symbol']} - ${route_Data['currency_ID']}';
+    });
+
     //print(data['Total'].toString());
     List<double> TempPrice = [];
     try {
@@ -266,9 +273,9 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
                 pinned: true,
                 snap: true,
                 floating: true,
-                expandedHeight: MediaQuery.of(context).size.height / 2,
+                expandedHeight: MediaQuery.of(context).size.height * 0.4,
                 centerTitle: true,
-                collapsedHeight: MediaQuery.of(context).size.height / 2,
+                collapsedHeight: MediaQuery.of(context).size.height * 0.4,
                 flexibleSpace: Container(
                   decoration: const BoxDecoration(
                     boxShadow: [
@@ -285,73 +292,81 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
                     ),
                     color: Color(0xff232d37),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        right: 18.0, left: 12.0, top: 24, bottom: 12),
-                    child: LineChart(
-                      
-                      LineChartData(
-                      
-                      minY: minPrice.toDouble(),
-                      maxY: maxPrice.toDouble(),
-                      lineTouchData: LineTouchData(enabled: true),
-                      borderData: FlBorderData(
-                          show: true,
-                          border: Border.all(
-                              color: const Color(0xff37434d), width: 1)),
-                      titlesData: FlTitlesData(
-                        show: true,
-                        rightTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                        topTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: false),
-                        ),
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            interval: interval,
-                            getTitlesWidget: leftTitleWidgets,
-                            reservedSize: 42,
-                          ),
-                        ),
-                      ),
-                      lineBarsData: [
-                        LineChartBarData(
-                          spots: priceData,
-                          isCurved: true,
-                          gradient: LinearGradient(
-                            colors: [
-                              ColorTween(
-                                      begin: gradientColors[0],
-                                      end: gradientColors[1])
-                                  .lerp(0.2)!,
-                              ColorTween(
-                                      begin: gradientColors[0],
-                                      end: gradientColors[1])
-                                  .lerp(0.2)!, //lerp is used for transition
-                            ],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ),
-                          barWidth: 5,
-                          isStrokeCapRound: true,
-                          dotData: FlDotData(
-                            show: false,
-                          ),
-                          belowBarData: BarAreaData(
+                  child: Container(
+                    child: Stack(children: [
+                      Positioned(
+                          left: 0,
+                          top: 0,
+                          child: Text(
+                            ChartTitle,
+                            style: TextStyle(color: Colors.white),
+                          )),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            right: 20.0, left: 20.0, top: 45, bottom: 12),
+                        child: LineChart(LineChartData(
+                          minY: minPrice.toDouble(),
+                          maxY: maxPrice.toDouble(),
+                          lineTouchData: LineTouchData(enabled: true),
+                          borderData: FlBorderData(
+                              show: true,
+                              border: Border.all(
+                                  color: const Color(0xff37434d), width: 1)),
+                          titlesData: FlTitlesData(
                             show: true,
-                            gradient: LinearGradient(
-                              colors: gradientColors
-                                  .map((color) => color.withOpacity(0.3))
-                                  .toList(),
-                              begin: Alignment.centerLeft,
-                              end: Alignment.centerRight,
+                            rightTitles: AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                            topTitles: AxisTitles(
+                              sideTitles: SideTitles(showTitles: false),
+                            ),
+                            leftTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                interval: interval,
+                                getTitlesWidget: leftTitleWidgets,
+                                reservedSize: 42,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    )),
+                          lineBarsData: [
+                            LineChartBarData(
+                              spots: priceData,
+                              isCurved: true,
+                              gradient: LinearGradient(
+                                colors: [
+                                  ColorTween(
+                                          begin: gradientColors[0],
+                                          end: gradientColors[1])
+                                      .lerp(0.2)!,
+                                  ColorTween(
+                                          begin: gradientColors[0],
+                                          end: gradientColors[1])
+                                      .lerp(0.2)!, //lerp is used for transition
+                                ],
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                              ),
+                              barWidth: 5,
+                              isStrokeCapRound: true,
+                              dotData: FlDotData(
+                                show: false,
+                              ),
+                              belowBarData: BarAreaData(
+                                show: true,
+                                gradient: LinearGradient(
+                                  colors: gradientColors
+                                      .map((color) => color.withOpacity(0.3))
+                                      .toList(),
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )),
+                      ),
+                    ]),
                   ),
                 ),
               ),
@@ -368,7 +383,7 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
                           child: ListTile(
                               title: Text(
                                 '${NewsInstance[index].title}',
-                                style: TextStyle(color: Colors.white),
+                                style: const TextStyle(color: Colors.white),
                               ),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -381,14 +396,14 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
                                       });
                                     },
                                     child: Text('${NewsInstance[index].url}',
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                             color: Colors.lightBlueAccent)),
                                   ),
                                   Text(
                                     NewsInstance[index].source +
                                         ' | ' +
                                         NewsInstance[index].publish_time,
-                                    style: TextStyle(color: Colors.grey),
+                                    style: const TextStyle(color: Colors.grey),
                                   )
                                 ],
                               )),
@@ -401,4 +416,3 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
     );
   }
 }
-

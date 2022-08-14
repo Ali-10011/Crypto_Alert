@@ -5,6 +5,7 @@ import 'dart:async';
 import 'dart:convert' as convert;
 import 'package:cryptoalert/global/global.dart' as globals;
 import 'package:http/http.dart' as http;
+import 'package:cryptoalert/services/CryptoPricesData.dart';
 
 class LoadingState extends StatefulWidget {
   const LoadingState({Key? key}) : super(key: key);
@@ -64,13 +65,16 @@ class _LoadingStateState extends State<LoadingState> {
       }
     } catch (e) {
       print(e);
-      TopData = [];
     }
   }
 
   void WaitForData() async {
     await cryptorequest();
-    Navigator.pushReplacementNamed(context, '/initial');
+    if (TopData.isNotEmpty) {
+      Navigator.pushReplacementNamed(context, '/initial');
+    } else {
+      Navigator.pushReplacementNamed(context, '/errpage');
+    }
   }
 
   @override

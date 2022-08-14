@@ -1,4 +1,3 @@
-import 'package:cryptoalert/screens/CryptoConversion.dart';
 import 'package:cryptoalert/screens/details.dart';
 import 'package:cryptoalert/services/CryptoPricesData.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +7,7 @@ import 'package:cryptoalert/models/TopCrypto.dart';
 import 'package:chart_sparkline/chart_sparkline.dart';
 import 'package:cryptoalert/global/global.dart' as globals;
 import 'package:http/http.dart' as http;
+
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -57,14 +57,12 @@ class _HomePageState extends State<HomePage> {
       );
       if (response.statusCode == 200) {
         jsonResponse = convert.jsonDecode(response.body) as List<dynamic>;
-        //print(jsonResponse[0]);
-        //TopData = [];
         convert.jsonEncode(jsonResponse);
         if (jsonResponse.length < 20) {
           globals.hasNextPage = false;
         }
         setState(() {
-          for (int i = 0; i < jsonResponse.length; i++) {
+          for (int i = 0; i < jsonResponse.length; i++) {           
             TopData.add(CryptoData(
                 ID: jsonResponse[i]['id'].toString(),
                 Symbol: jsonResponse[i]['symbol'].toString(),
@@ -99,15 +97,14 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     timer = Timer.periodic(const Duration(seconds: 5), (Timer t) async {
-     await cryptodataupdate();
+      await cryptodataupdate();
       setState(() {
-       globals.length = TopData.length;
-     });
+        globals.length = TopData.length;
+      });
     });
 
     controller.addListener(() {
       if (controller.position.maxScrollExtent == controller.offset) {
-        print('Booyah');
         cryptorequest();
       }
     });
@@ -115,6 +112,7 @@ class _HomePageState extends State<HomePage> {
     //});
   }
 
+  
   @override
   void dispose() {
     timer?.cancel();
@@ -256,6 +254,8 @@ class _HomePageState extends State<HomePage> {
               SliverToBoxAdapter(
                   child: ListView.builder(
                       //controller: controller,
+                      physics: const ClampingScrollPhysics(),
+
                       //prevents last element from being out of bounds
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
@@ -388,7 +388,7 @@ class _HomePageState extends State<HomePage> {
                       }))
             ],
           ),
-        ),
+        )
       ),
     );
   }

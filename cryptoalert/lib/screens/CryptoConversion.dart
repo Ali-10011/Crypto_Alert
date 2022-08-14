@@ -22,10 +22,17 @@ class _ConversionState extends State<Conversion> {
       'https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1547033579';
   String testUrl2 =
       "https://assets.coingecko.com/coins/images/279/large/ethereum.png?1595348880";
-  double testPrice1 = double.parse(TopData[0].current_price);
-  double testPrice2 = double.parse(TopData[1].current_price);
-  double factor = double.parse(TopData[0].current_price) /
+     
+  late double testPrice1 = double.parse(TopData[0].current_price);
+ late double testPrice2 = double.parse(TopData[1].current_price);
+ late double factor = double.parse(TopData[0].current_price) /
       double.parse(TopData[1].current_price);
+      
+
+      void initState()
+      {
+        super.initState();
+      }
   void dispose() {
     controller.dispose();
     controllerResult.dispose();
@@ -51,10 +58,10 @@ class _ConversionState extends State<Conversion> {
                       children: [
                         Padding(
                           padding: EdgeInsets.fromLTRB(
-                              MediaQuery.of(context).size.width * 0.2,
+                              MediaQuery.of(context).size.width * 0.1,
                               50,
-                              MediaQuery.of(context).size.width * 0.2,
-                              100),
+                              MediaQuery.of(context).size.width * 0.1,
+                              50),
                           child: Container(
                               width: MediaQuery.of(context).size.width * 0.5,
                               height: 100,
@@ -142,13 +149,12 @@ class _ConversionState extends State<Conversion> {
                                 testPrice1 = testPrice2;
                                 testPrice2 = swapdouble;
                                 factor = testPrice1 / testPrice2;
-                                 if (controller.text != '') {
-                                          //print('Inside');
-                                          controllerResult.text =
-                                              (double.parse(controller.text) *
-                                                      factor)
-                                                  .toString();
-                                        }
+                                if (controller.text != '') {
+                                  //print('Inside');
+                                  controllerResult.text =
+                                      (double.parse(controller.text) * factor)
+                                          .toString();
+                                }
                               });
                             },
                             icon: const Icon(
@@ -158,10 +164,10 @@ class _ConversionState extends State<Conversion> {
                             )),
                         Padding(
                           padding: EdgeInsets.fromLTRB(
-                              MediaQuery.of(context).size.width * 0.2,
+                              MediaQuery.of(context).size.width * 0.1,
                               50,
-                              MediaQuery.of(context).size.width * 0.2,
-                              100),
+                              MediaQuery.of(context).size.width * 0.1,
+                              50),
                           child: Container(
                               width: MediaQuery.of(context).size.width * 0.5,
                               height: 100,
@@ -265,7 +271,6 @@ class _ConversionState extends State<Conversion> {
                                   double.parse(TopData[index].current_price);
                               factor = testPrice1 / testPrice2;
                               testTitle1 = TopData[index].ID.capitalize();
-                                
                             } else {
                               testUrl2 = TopData[index].Icon_Url;
                               testPrice2 =
@@ -273,13 +278,12 @@ class _ConversionState extends State<Conversion> {
                               factor = testPrice1 / testPrice2;
                               testTitle2 = TopData[index].ID.capitalize();
                             }
-                             if (controller.text != '') {
-                                          //print('Inside');
-                                          controllerResult.text =
-                                              (double.parse(controller.text) *
-                                                      factor)
-                                                  .toString();
-                                        }
+                            if (controller.text != '') {
+                              //print('Inside');
+                              controllerResult.text =
+                                  (double.parse(controller.text) * factor)
+                                      .toString();
+                            }
                           });
                           Navigator.pop(context);
                         },

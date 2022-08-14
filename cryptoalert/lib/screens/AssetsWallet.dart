@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+
 class Wallet extends StatefulWidget {
   const Wallet({Key? key}) : super(key: key);
 
@@ -9,11 +10,14 @@ class Wallet extends StatefulWidget {
 
 class _WalletState extends State<Wallet> {
   @override
+  void initState() {
+    super.initState();
+  
+  }
+
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        body: Text('Wallet')
-      ),
+      child: Scaffold(body: Text('Wallet')),
     );
   }
 }

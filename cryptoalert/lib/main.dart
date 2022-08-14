@@ -4,6 +4,7 @@ import 'package:cryptoalert/screens/loader.dart';
 import 'package:cryptoalert/screens/CryptoConversion.dart';
 import 'package:cryptoalert/screens/AssetsWallet.dart';
 import 'package:flutter/material.dart';
+import 'package:cryptoalert/screens/ErrorScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
         '/details': (context) => const CurrencyDetails(),
         '/convert': (context) => const Conversion(),
         '/wallet': (context) => const Wallet(),
+        '/errpage': (context) =>const ErrorScreen(),
         //'/news' : (context) => const NewsDetail(),
         ///details': (context) => const LineChartSample2(),
       },

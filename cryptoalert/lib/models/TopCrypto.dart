@@ -26,5 +26,5 @@ class CryptoData {
       required this.SparklineData});
 }
 
-List<CryptoData> TopData = [];
 
+List<CryptoData> TopData = [];

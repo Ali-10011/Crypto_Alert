@@ -174,6 +174,21 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
     const Color(0xff23b6e6),
     const Color(0xff02d39a),
   ];
+  Widget bottomTitleWidgets(double value, TitleMeta meta) {
+    const style = TextStyle(
+      color: Color(0xff68737d),
+      fontWeight: FontWeight.bold,
+      fontSize: 16,
+    );
+    late String text;
+    if (value % 2 == 0 && value != 0) {
+      text = value.toInt().toString();
+    } else {
+      return Container();
+    }
+
+    return Text(text, style: style, textAlign: TextAlign.left);
+  }
 
   Widget leftTitleWidgets(double value, TitleMeta meta) {
     const style = TextStyle(
@@ -294,13 +309,34 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
                   ),
                   child: Container(
                     child: Stack(children: [
-                      Positioned(
-                          left: 0,
-                          top: 0,
-                          child: Text(
-                            ChartTitle,
-                            style: TextStyle(color: Colors.white),
-                          )),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              ChartTitle,
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            const Text(
+                              '24 Hours Chart',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Text('High: ${maxPrice}',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
+                            Text('Low: ${minPrice}',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold))
+                          ],
+                        ),
+                      ),
                       Padding(
                         padding: const EdgeInsets.only(
                             right: 20.0, left: 20.0, top: 45, bottom: 12),
@@ -311,9 +347,17 @@ class _CurrencyDetailsState extends State<CurrencyDetails> {
                           borderData: FlBorderData(
                               show: true,
                               border: Border.all(
-                                  color: const Color(0xff37434d), width: 1)),
+                                  color: const Color(0xff37434d), width: 3)),
                           titlesData: FlTitlesData(
                             show: true,
+                            bottomTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                interval: interval,
+                                getTitlesWidget: bottomTitleWidgets,
+                                reservedSize: 42,
+                              ),
+                            ),
                             rightTitles: AxisTitles(
                               sideTitles: SideTitles(showTitles: false),
                             ),

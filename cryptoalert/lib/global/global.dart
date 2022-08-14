@@ -19,4 +19,4 @@ bool isLoadMoreRunning = false;
 
 late ScrollController controller;
 
-
+late String errmessage;
